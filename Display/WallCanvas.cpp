@@ -7,13 +7,15 @@
 namespace OpenEngine {
 namespace Display {
 
-    WallCanvas::WallCanvas(TextureLoader& loader, IFontResourcePtr font) 
+    WallCanvas::WallCanvas(IRenderer& renderer, TextureLoader& loader, IFontResourcePtr font) 
     : TextureCanvasBase()
     , init(false)
     , font(font)
+    , renderer(renderer)
     , loader(loader) {
 
-    renderer = new WallRenderer();
+    wrenderer = new WallRenderer();
+    wrap = new RenderCanvasWrapper(this);
 }
 
 WallCanvas::~WallCanvas() {
@@ -23,7 +25,7 @@ WallCanvas::~WallCanvas() {
 void WallCanvas::AddTextureWithText(ITextureResourcePtr tex, string txt) {
     WallItem *wi = new WallItem();
     ItemT *it = new ItemT();
-    loader.Load(tex);
+
     it->tex = tex;    
     wi->item = it;
 
@@ -64,7 +66,7 @@ void WallCanvas::Handle(Display::InitializeEventArg arg) {
     SetTextureWidth(arg.canvas.GetWidth());
     SetTextureHeight(arg.canvas.GetHeight());
     SetupTexture();
-
+    ((IListener<Renderers::InitializeEventArg>&)renderer).Handle(Renderers::InitializeEventArg(*wrap));
     init = true;
 }
 
@@ -141,7 +143,7 @@ void WallCanvas::Handle(Display::ProcessEventArg arg) {
          itr++) {
         WallItem* wi = *itr;
 
-        renderer->RenderWallItem(wi);
+        wrenderer->RenderWallItem(wi);
 
     }
 
@@ -266,10 +268,10 @@ void WallRenderer::RenderItemT(ItemT *item) {
                          item->tex->GetHeight());
 
         glBegin(GL_QUADS);
-        glTexCoord2f(0,0);        glVertex2f(0,0);
-        glTexCoord2f(1,0);        glVertex2f(size[0],0);
-        glTexCoord2f(1,1);        glVertex2f(size[0],size[1]);
-        glTexCoord2f(0,1);        glVertex2f(0,size[1]);        
+        glTexCoord2f(0,1);        glVertex2f(0,0);
+        glTexCoord2f(1,1);        glVertex2f(size[0],0);
+        glTexCoord2f(1,0);        glVertex2f(size[0],size[1]);
+        glTexCoord2f(0,0);        glVertex2f(0,size[1]);        
         glEnd();
     
 }

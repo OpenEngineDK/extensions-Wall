@@ -15,6 +15,7 @@
 #include <Display/ICanvas.h>
 #include <Resources/IFontResource.h>
 #include <Devices/IMouse.h>
+#include <Renderers/IRenderer.h>
 #include <Renderers/TextureLoader.h>
 
 #include <vector>
@@ -112,17 +113,33 @@ class WallCanvas : public TextureCanvasBase
                  , public IListener<MouseButtonEventArg> {
 private:
     bool init;
-    WallRenderer *renderer;
+    WallRenderer *wrenderer;
     IFontResourcePtr font;
 
+    class RenderCanvasWrapper : public IRenderCanvas {
+        WallCanvas *wc;
+    public:
+        RenderCanvasWrapper(WallCanvas *wc) : wc(wc) {}
+        void Handle(InitializeEventArg arg)  {}
+        void Handle(DeinitializeEventArg arg)  {}
+        void Handle(ProcessEventArg arg)  {}
+        void Handle(ResizeEventArg arg)  {}
+        unsigned int GetHeight() const { return wc->GetHeight(); }
+        unsigned int GetWidth() const { return wc->GetWidth(); }
+        void SetHeight(unsigned int h) { wc->SetHeight(h); }
+        void SetWidth(unsigned int w) { wc->SetWidth(w); }
+        ITexture2DPtr GetTexture() {return wc->GetTexture();}
+    };
 
+    RenderCanvasWrapper *wrap;
 
     vector<WallItem*> items;
     WallItem* selectedItem;
     Vector<2,float> selectedOffset;
+    IRenderer& renderer;
     TextureLoader& loader;
 public:
-    WallCanvas(TextureLoader& loader, IFontResourcePtr font);
+    WallCanvas(IRenderer& renderer, TextureLoader& loader, IFontResourcePtr font);
     virtual ~WallCanvas();
 
     void AddTextureWithText(ITextureResourcePtr tex, string txt);
