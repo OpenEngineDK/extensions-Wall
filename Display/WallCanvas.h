@@ -138,11 +138,15 @@ private:
     Vector<2,float> selectedOffset;
     IRenderer& renderer;
     TextureLoader& loader;
+    Vector<4,float> backgroundColor;
 public:
     WallCanvas(IRenderer& renderer, TextureLoader& loader, IFontResourcePtr font);
     virtual ~WallCanvas();
 
+    void SetBackgroundColor(Vector<4,float> bg);
+
     void AddTextureWithText(ITextureResourcePtr tex, string txt);
+    void AddText(string txt, IFontResourcePtr afont);
     void AddText(string txt);
 
     void Handle(Display::InitializeEventArg arg);

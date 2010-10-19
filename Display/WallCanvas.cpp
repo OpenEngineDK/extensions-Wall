@@ -16,6 +16,7 @@ namespace Display {
 
     wrenderer = new WallRenderer();
     wrap = new RenderCanvasWrapper(this);
+    backgroundColor = Vector<4,float>(0.5);
 }
 
 WallCanvas::~WallCanvas() {
@@ -23,15 +24,18 @@ WallCanvas::~WallCanvas() {
 }
 
 void WallCanvas::AddText(string txt) {
+    AddText(txt,font);
+}
+void WallCanvas::AddText(string txt, IFontResourcePtr fnt) {
     WallItem *wit = new WallItem();
     ItemT* it = new ItemT();
-    Vector<2,int> size = font->TextDim(txt);
-    IFontTextureResourcePtr txtt = font->CreateFontTexture(size[0]+2, size[1]+2);
+    Vector<2,int> size = fnt->TextDim(txt);
+    IFontTextureResourcePtr txtt = fnt->CreateFontTexture(size[0]+2, size[1]+2);
     
     
     txtt->Clear(Vector<4,float>(0,0,0,0));
 
-    font->RenderText(txt, txtt, 0, 0);
+    fnt->RenderText(txt, txtt, 0, 0);
 
     loader.Load(txtt);
 
@@ -94,8 +98,12 @@ void WallCanvas::Handle(ResizeEventArg arg) {
     SetupTexture();
 }
 
+void WallCanvas::SetBackgroundColor(Vector<4,float> bg) {
+    backgroundColor = bg;
+}
+
 void WallCanvas::Handle(Display::ProcessEventArg arg) {
-    Vector<4,float> bg(0.7);
+    Vector<4,float> bg = backgroundColor;
     glClearColor(bg[0],bg[1],bg[2],bg[3]);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
