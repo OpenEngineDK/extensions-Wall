@@ -22,6 +22,24 @@ WallCanvas::~WallCanvas() {
     
 }
 
+void WallCanvas::AddText(string txt) {
+    WallItem *wit = new WallItem();
+    ItemT* it = new ItemT();
+    Vector<2,int> size = font->TextDim(txt);
+    IFontTextureResourcePtr txtt = font->CreateFontTexture(size[0]+2, size[1]+2);
+    
+    
+    txtt->Clear(Vector<4,float>(0,0,0,0));
+
+    font->RenderText(txt, txtt, 0, 0);
+
+    loader.Load(txtt);
+
+    wit->item = it;
+    it->tex = txtt;
+    items.push_back(wit);
+}
+
 void WallCanvas::AddTextureWithText(ITextureResourcePtr tex, string txt) {
     WallItem *wi = new WallItem();
     ItemT *it = new ItemT();

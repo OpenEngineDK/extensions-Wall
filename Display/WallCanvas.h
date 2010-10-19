@@ -143,7 +143,7 @@ public:
     virtual ~WallCanvas();
 
     void AddTextureWithText(ITextureResourcePtr tex, string txt);
-
+    void AddText(string txt);
 
     void Handle(Display::InitializeEventArg arg);
     void Handle(Display::ProcessEventArg arg);
