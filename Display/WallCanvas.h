@@ -17,6 +17,7 @@
 #include <Devices/IMouse.h>
 #include <Renderers/IRenderer.h>
 #include <Renderers/TextureLoader.h>
+#include <Display/ILayout.h>
 
 #include <vector>
 
@@ -63,7 +64,7 @@ public:
 
 
 
-class WallItem {
+class WallItem : public Rect {
 private:
     Vector<2,float> origin;
     //Vector<2,float> size;
@@ -115,6 +116,7 @@ private:
     bool init;
     WallRenderer *wrenderer;
     IFontResourcePtr font;
+    
 
     class RenderCanvasWrapper : public IRenderCanvas {
         WallCanvas *wc;
@@ -138,9 +140,13 @@ private:
     Vector<2,float> selectedOffset;
     IRenderer& renderer;
     TextureLoader& loader;
+    ILayout* layout;
     Vector<4,float> backgroundColor;
+    
+    void RedoLayout();
+
 public:
-    WallCanvas(IRenderer& renderer, TextureLoader& loader, IFontResourcePtr font);
+    WallCanvas(IRenderer& renderer, TextureLoader& loader, IFontResourcePtr font, ILayout* l = NULL);
     virtual ~WallCanvas();
 
     void SetBackgroundColor(Vector<4,float> bg);

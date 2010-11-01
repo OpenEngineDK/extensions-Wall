@@ -7,12 +7,13 @@
 namespace OpenEngine {
 namespace Display {
 
-    WallCanvas::WallCanvas(IRenderer& renderer, TextureLoader& loader, IFontResourcePtr font) 
+    WallCanvas::WallCanvas(IRenderer& renderer, TextureLoader& loader, IFontResourcePtr font, ILayout *l) 
     : TextureCanvasBase()
     , init(false)
     , font(font)
     , renderer(renderer)
-    , loader(loader) {
+    , loader(loader)
+    , layout(l) {
 
     wrenderer = new WallRenderer();
     wrap = new RenderCanvasWrapper(this);
@@ -42,6 +43,7 @@ void WallCanvas::AddText(string txt, IFontResourcePtr fnt) {
     wit->item = it;
     it->tex = txtt;
     items.push_back(wit);
+    RedoLayout();
 }
 
 void WallCanvas::AddTextureWithText(ITextureResourcePtr tex, string txt) {
@@ -78,7 +80,7 @@ void WallCanvas::AddTextureWithText(ITextureResourcePtr tex, string txt) {
     wit->SetOrigin(mid);
     gi->AddItem(wit);
     items.push_back(gitem);
-    
+    RedoLayout();
 
 }
 
@@ -90,6 +92,7 @@ void WallCanvas::Handle(Display::InitializeEventArg arg) {
     SetupTexture();
     ((IListener<Renderers::InitializeEventArg>&)renderer).Handle(Renderers::InitializeEventArg(*wrap));
     init = true;
+    RedoLayout();
 }
 
 void WallCanvas::Handle(ResizeEventArg arg) {
@@ -266,6 +269,13 @@ void WallCanvas::Handle(MouseButtonEventArg arg) {
         }
     }
     selectedItem = NULL;
+}
+
+void WallCanvas::RedoLayout() {
+    if (layout) {
+        RectType r = vector<Rect*>(items.begin(), items.end());
+        layout->LayoutItems(r, Vector<2,float>(GetWidth(), GetHeight()));
+    }
 }
     
 
