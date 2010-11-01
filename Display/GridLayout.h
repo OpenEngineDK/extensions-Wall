@@ -22,8 +22,9 @@ namespace Display {
  */
 class GridLayout : public ILayout {
 private:
-
+    float margin;
 public:
+    GridLayout(float margin = 5.0);
     void LayoutItems(RectType items, Vector<2,float> size);
 };
 

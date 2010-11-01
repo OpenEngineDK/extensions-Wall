@@ -6,12 +6,14 @@ namespace Display {
 
     using namespace std;
 
+    GridLayout::GridLayout(float margin) : margin(margin) {}
+
     void GridLayout::LayoutItems(RectType items, Vector<2,float> size) {        
         float w;
         int cols = 0;
         for(RectType::iterator itr = items.begin(); itr != items.end(); itr++) {
             Rect *r = *itr;
-            w += r->GetSize()[0];
+            w += r->GetSize()[0] + margin;
             if (w > size[0])
                 break;
             cols++;
@@ -28,11 +30,11 @@ namespace Display {
         
         for(RectType::iterator itr = items.begin(); itr != items.end(); itr++) {
             Rect *r = *itr;
-            float iw = r->GetSize()[0];
+            float iw = r->GetSize()[0] + margin;
             colWidths[colIdx % cols] = max(colWidths[colIdx % cols],iw);
 
             int rowIdx = colIdx / cols;            
-            float ih = r->GetSize()[1];
+            float ih = r->GetSize()[1] + margin;
             rowHeights[rowIdx] = max(rowHeights[rowIdx], ih);
 
             ++colIdx;
