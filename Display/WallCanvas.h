@@ -23,7 +23,6 @@
 #include <Display/OrthogonalViewingVolume.h>
 #include <Resources/IFontTextureResource.h>
 
-
 #include <vector>
 
 using namespace OpenEngine::Resources;
@@ -109,12 +108,10 @@ public:
 
 
 
-template<class Backend>
 class WallCanvas : public ICanvas
                  , public IListener<MouseMovedEventArg>
                  , public IListener<MouseButtonEventArg> {
 private:
-    Backend backend;
     bool init;
     WallRenderer *wrenderer;
     IFontResourcePtr font;
@@ -122,7 +119,8 @@ private:
     class RenderCanvasWrapper : public IRenderCanvas {
         WallCanvas *wc;
     public:
-        RenderCanvasWrapper(WallCanvas *wc) : wc(wc) {}
+        RenderCanvasWrapper(WallCanvas *wc) : wc(wc) {
+        }
         void Handle(InitializeEventArg arg)  {}
         void Handle(DeinitializeEventArg arg)  {}
         void Handle(ProcessEventArg arg)  {}
@@ -147,13 +145,14 @@ private:
     void RedoLayout() {
         if (layout) {
             RectType r = vector<Rect*>(items.begin(), items.end());
-            layout->LayoutItems(r, Vector<2,float>(GetWidth(), GetHeight()));
+            // layout->LayoutItems(r, Vector<2,float>(GetWidth(), GetHeight()));
         }
     }
 
 public:
-    WallCanvas(IRenderer& renderer, TextureLoader& loader, IFontResourcePtr font, ILayout* l = NULL)
-        : init(false)
+    WallCanvas(ICanvasBackend* backend, IRenderer& renderer, TextureLoader& loader, IFontResourcePtr font, ILayout* l = NULL)
+        : ICanvas(backend)
+        , init(false)
         , font(font)
         , renderer(renderer)
         , loader(loader)
@@ -235,17 +234,21 @@ public:
 
     void Handle(Display::InitializeEventArg arg) {
         if (init) return;
-        backend.Init(arg.canvas.GetWidth(), arg.canvas.GetHeight());
+        backend->Init(arg.canvas.GetWidth(), arg.canvas.GetHeight());
         ((IListener<Renderers::InitializeEventArg>&)renderer).Handle(Renderers::InitializeEventArg(*wrap));
         init = true;
         RedoLayout();
     }
 
     void Handle(Display::ProcessEventArg arg) {
-        backend.Pre();
-        Vector<4,float> bg = backgroundColor;
-        glClearColor(bg[0],bg[1],bg[2],bg[3]);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        backend->Pre();
+
+        renderer.SetBackgroundColor(backgroundColor);
+        ((IListener<Renderers::ProcessEventArg>&)renderer).Handle(Renderers::ProcessEventArg(*wrap, arg.start, arg.approx));
+
+        // Vector<4,float> bg = backgroundColor;
+        // glClearColor(bg[0],bg[1],bg[2],bg[3]);
+        // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
         Vector<4,int> d(0, 0, GetWidth(), GetHeight());
@@ -329,17 +332,17 @@ public:
         if (!texture) glDisable(GL_TEXTURE_2D);
 
 
-        backend.Post();
+        backend->Post();
     }
 
     void Handle(Display::ResizeEventArg arg) {
-        backend.SetDimensions(arg.canvas.GetWidth(), arg.canvas.GetHeight());
+        backend->SetDimensions(arg.canvas.GetWidth(), arg.canvas.GetHeight());
     }
 
     void Handle(Display::DeinitializeEventArg arg) { 
         if (!init) return;
         
-        backend.Deinit();
+        backend->Deinit();
         init = false;
     }
 
@@ -392,24 +395,24 @@ public:
     }
 
     unsigned int GetWidth() const {
-        return backend.GetWidth();
+        return backend->GetTexture()->GetWidth();
     };
 
     unsigned int GetHeight() const {
-        return backend.GetHeight();
+        return backend->GetTexture()->GetHeight();
     };
 
 
     void SetWidth(const unsigned int width) {
-        backend.SetDimensions(width, backend.GetHeight());
+        backend->SetDimensions(width, backend->GetTexture()->GetHeight());
     }
 
     void SetHeight(const unsigned int height) {
-        backend.SetDimensions(backend.GetWidth(), height);
+        backend->SetDimensions(backend->GetTexture()->GetWidth(), height);
     }
 
     ITexture2DPtr GetTexture() {
-        return backend.tex;
+        return backend->GetTexture();
     }
 };
 
