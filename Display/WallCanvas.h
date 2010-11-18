@@ -44,6 +44,7 @@ class Item {
 public:
     virtual Vector<2,float> GetSize() =0;
     virtual void Apply(WallRenderer *r) =0;
+    virtual void Layout() = 0;
 };
     
 class ItemT : public Item {
@@ -53,6 +54,7 @@ public:
     Vector<2,float> GetSize();
 
     void Apply(WallRenderer *r);
+    void Layout() {}
 };
 
 
@@ -103,6 +105,19 @@ public:
             r->RenderWallItem(*itr);
         }
     }
+    void Layout() {
+        if (items.size() == 2) { // hack
+            WallItem *wi = items[0];
+            WallItem *wit = items[1];
+
+            Vector<2,float> mid = wi->GetSize();
+    
+            mid[0] = mid[0]/2.0 - wit->GetSize()[0]/2.0;
+
+            wit->SetOrigin(mid);
+
+        }
+    }
     
 };
 
@@ -144,8 +159,14 @@ private:
     
     void RedoLayout() {
         if (layout) {
-            RectType r = vector<Rect*>(items.begin(), items.end());
-            // layout->LayoutItems(r, Vector<2,float>(GetWidth(), GetHeight()));
+            for (vector<WallItem*>::iterator itr = items.begin();
+                 itr != items.end();
+                 itr++) {
+                (*itr)->item->Layout();
+            }
+
+            RectType r = vector<Rect*>(items.begin(), items.end());            
+            layout->LayoutItems(r, Vector<2,float>(GetWidth(), GetHeight()));            
         }
     }
 
@@ -157,7 +178,7 @@ public:
         , renderer(renderer)
         , loader(loader)
         , layout(l) {
-
+        selectedItem = NULL;
         wrenderer = new WallRenderer();
         wrap = new RenderCanvasWrapper(this);
         backgroundColor = Vector<4,float>(0.5);
