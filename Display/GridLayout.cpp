@@ -22,7 +22,9 @@ namespace Display {
             logger.warning << "Cant fit anything in the grid, aborting" << logger.end;
             return;
         }
-        int rows = items.size() / cols;
+        int rows = ceil(items.size() / float(cols));
+
+        logger.info << rows << ", " << cols << logger.end;
         
         vector<float> colWidths(cols);      
         vector<float> rowHeights(rows);
