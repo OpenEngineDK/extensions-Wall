@@ -63,6 +63,7 @@ private:
     Vector<2,float> origin;
     //Vector<2,float> size;
 public:
+    WallItem() : item(NULL) {}
     Item *item;
     Vector<2,float> GetOrigin() { return origin; }
     Vector<2,float> GetSize() { return item->GetSize(); }

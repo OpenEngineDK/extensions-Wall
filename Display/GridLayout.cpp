@@ -45,16 +45,13 @@ namespace Display {
         colOffset[0] = 0;
         rowOffset[0] = 0;
         
-        for (int i=1;i<=colWidths.size();i++) {
-            colOffset[i] = colOffset[i-1] +  colWidths[i-1];            
+        for (unsigned int i=1;i<colWidths.size();i++) {
+            colOffset.at(i) = colOffset.at(i-1) +  colWidths.at(i-1);            
         }
-        for (int i=1;i<=rowHeights.size();i++) {
-            rowOffset[i] = rowOffset[i-1] +  rowHeights[i-1];
+        for (unsigned int i=1;i<rowHeights.size();i++) {
+            rowOffset.at(i) = rowOffset.at(i-1) +  rowHeights.at(i-1);
 
         }
-
-        
-
 
         int idx = 0;
         for (RectType::iterator itr = items.begin(); itr != items.end(); itr++) {
