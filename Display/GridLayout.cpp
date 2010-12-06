@@ -9,7 +9,7 @@ namespace Display {
     GridLayout::GridLayout(float margin) : margin(margin) {}
 
     void GridLayout::LayoutItems(RectType items, Vector<2,float> size) {        
-        float w;
+        float w = 0.0f;
         int cols = 0;
         for(RectType::iterator itr = items.begin(); itr != items.end(); itr++) {
             Rect *r = *itr;
@@ -17,9 +17,10 @@ namespace Display {
             if (w > size[0])
                 break;
             cols++;
+
         }
         if (cols == 0) {
-            logger.warning << "Cant fit anything in the grid, aborting" << logger.end;
+            logger.warning << "Cant fit anything in the grid: " << size << logger.end;
             return;
         }
         int rows = ceil(items.size() / float(cols));
@@ -52,7 +53,6 @@ namespace Display {
         }
         for (unsigned int i=1;i<rowHeights.size();i++) {
             rowOffset.at(i) = rowOffset.at(i-1) +  rowHeights.at(i-1);
-
         }
 
         int idx = 0;
@@ -63,6 +63,12 @@ namespace Display {
             
             Vector<2,float> pos(colOffset[col],rowOffset[row]);
             
+            if (pos[0] + r->GetSize()[0] >= size[0]) 
+                pos[0] = size[0] - r->GetSize()[0];
+            if (pos[1] + r->GetSize()[1] >= size[1]) 
+                pos[1] = size[1] - r->GetSize()[1];
+            
+
             r->SetOrigin(pos);
 
             logger.warning << col << "," << row << " " << pos << logger.end;
