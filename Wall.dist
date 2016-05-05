@@ -1,5 +1,5 @@
 # dist file for Wall
 
-darcs      /extensions/Wall            http://openengine.dk/code/extensions/Wall
-darcs-dev  /extensions/Wall            fh.daimi.au.dk:/users/cgd/code/extensions/Wall
+git      /extensions/Wall            https://github.com/OpenEngineDK/extensions-Wall.git
+git-dev  /extensions/Wall            git@github.com:OpenEngineDK/extensions-Wall.git
 
